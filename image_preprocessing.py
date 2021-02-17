@@ -8,7 +8,7 @@ Created on Sat Jan 16 23:23:23 2021
 import cv2
 minValue = 70
 def processing(path):    
-    frame = cv2.imread(path)
+    frame = path
     
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray,(5,5),2)
