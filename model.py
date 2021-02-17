@@ -68,15 +68,11 @@ cnn.fit_generator(training_set,
                   epochs = 25,
                   validation_data =test_set,
                   validation_steps = steps_of_epoch_test)
-<<<<<<< HEAD
-
-=======
->>>>>>> 9eca573f9a605d0a403e3a5d0b662b4f2448adad
 
 
 model_json = cnn.to_json()
-with open("model-bw.json", "w") as json_file:
+with open("model-bw-ptest.json", "w") as json_file:
     json_file.write(model_json)
 print('Model Saved')
-cnn.save_weights('model-bw.h5')
+cnn.save_weights('model-bw-ptest.h5')
 print('Weights saved')
