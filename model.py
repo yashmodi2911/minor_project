@@ -68,7 +68,10 @@ cnn.fit_generator(training_set,
                   epochs = 25,
                   validation_data =test_set,
                   validation_steps = steps_of_epoch_test)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9eca573f9a605d0a403e3a5d0b662b4f2448adad
 
 
 model_json = cnn.to_json()
