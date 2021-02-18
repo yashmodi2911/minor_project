@@ -167,11 +167,11 @@ class app:
             self.filter.config(image=imgtk)
             
             #Configuring Character Panel
-            self.panel3.config(text=self.current_symbol,font=("Courier",50))
+            self.charpanel.config(text=self.current_symbol,font=("Courier",35))
             #Configuring Word Panel
-            self.panel4.config(text=self.word,font=("Courier",40))
+            self.wordpanel.config(text=self.word,font=("Courier",30))
             #Configuring Sentence Panel
-            self.panel5.config(text=self.str,font=("Courier",40))    
+            self.senpanel.config(text=self.str,font=("Courier",30))    
         
             self.root.after(50,video_loop())
             '''Tk().after(delay, callback=None) is a method defined for all tkinter widgets. This method simply calls the function
