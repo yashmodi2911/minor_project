@@ -12,7 +12,7 @@ class app:
         #frames for Video panel & Filtered panel, will be described in Video_loop()
         self.current_image = None
         self.current_image2 = None
-        
+        self.directory="model/"
         #The open() function opens a file, and returns it as a file object.
         #Syntax- open(file, mode), file -	The path and name of the file
             #"r" - Read - Default value. Opens a file for reading, error if the file does not exist
@@ -21,7 +21,7 @@ class app:
             #"x" - Create - Creates the specified file, returns an error if the file exist
             #"t" - Text - Default value. Text mode
             #"b" - Binary - Binary mode (e.g. images)
-    
+        
         self.json_file = open(self.directory+"model-bw.json", "r")
         #JSON - https://www.w3schools.com/python/python_json.asp
         self.model_json = self.json_file.read()
@@ -36,6 +36,23 @@ class app:
         self.loaded_model.load_weights(self.directory+"model-bw.h5")
         #The weights are saved directly from the model using the save_weights() function and later loaded using the
         #symmetrical load_weights() function.
+        self.json_file_dru = open(self.directory+"model-bw-dru.json" , "r")
+        self.model_json_dru = self.json_file_dru.read()
+        self.json_file_dru.close()
+        self.loaded_model_dru = model_from_json(self.model_json_dru)
+        self.loaded_model_dru.load_weights(self.directory+"model-bw-dru.h5")
+
+        self.json_file_tkdi = open(self.directory+"model-bw-tkdi.json" , "r")
+        self.model_json_tkdi = self.json_file_tkdi.read()
+        self.json_file_tkdi.close()
+        self.loaded_model_tkdi = model_from_json(self.model_json_tkdi)
+        self.loaded_model_tkdi.load_weights(self.directory+"model-bw-tkdi.h5")
+
+        self.json_file_smn = open(self.directory+"model-bw-mns.json" , "r")
+        self.model_json_smn = self.json_file_smn.read()
+        self.json_file_smn.close()
+        self.loaded_model_smn = model_from_json(self.model_json_smn)
+        self.loaded_model_smn.load_weights(self.directory+"model-bw-mns.h5")
         
         #Main Window Initialization
         self.root=Tk() 
@@ -190,9 +207,9 @@ class app:
         
         test_image = cv2.resize(test_image, (128,128))
         result = self.loaded_model.predict(test_image.reshape(1, 128, 128, 1))
-        result_dru = self.loaded_model_dru.predict(test_image.reshape(1 , 128 , 128 , 1))
-        result_tkdi = self.loaded_model_tkdi.predict(test_image.reshape(1 , 128 , 128 , 1))
-        result_smn = self.loaded_model_smn.predict(test_image.reshape(1 , 128 , 128 , 1))
+        result_dru = self.loaded_model-dru.predict(test_image.reshape(1 , 128 , 128 , 1))
+        result_tkdi = self.loaded_model-tkdi.predict(test_image.reshape(1 , 128 , 128 , 1))
+        result_smn = self.loaded_model-mns.predict(test_image.reshape(1 , 128 , 128 , 1))
         prediction={}
         prediction['blank'] = result[0][0]
         inde = 1

@@ -100,10 +100,10 @@ class Application:
         result = self.loaded_model.predict(test_image.reshape(1, 128, 128, 1))
         prediction={}
         prediction['blank'] = result[0][0]
-        inde = 1
+        inde = 0
         for i in ascii_uppercase:
             prediction[i] = result[0][inde]
-            inde += 1
+            
        
         prediction = sorted(prediction.items(), key=operator.itemgetter(1), reverse=True)
         self.current_symbol = prediction[0][0]
@@ -144,7 +144,7 @@ class Application:
     
     def destructor1(self):
         print("Closing Application...")
-        self.root1.destroy()
+        self.root.destroy()
 
 
 print("Starting Application...")
