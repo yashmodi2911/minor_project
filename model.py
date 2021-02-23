@@ -51,27 +51,30 @@ from keras.preprocessing.image import ImageDataGenerator
 
 train_datagen = ImageDataGenerator(
         rescale=1./255,
+        rotation_range=40,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
         shear_range=0.2,
         zoom_range=0.2,
         horizontal_flip=True)
 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
-training_set = train_datagen.flow_from_directory('tkdi/train',
+training_set = train_datagen.flow_from_directory('mns/train',
                                                  target_size=(sz, sz),
-                                                 batch_size=10,
+                                                 batch_size=2,
                                                  color_mode='grayscale',
                                                  class_mode='categorical')
 
-test_set = test_datagen.flow_from_directory('tkdi/test',
+test_set = test_datagen.flow_from_directory('mns/test',
                                             target_size=(sz , sz),
-                                            batch_size=10,
+                                            batch_size=2,
                                             color_mode='grayscale',
                                             class_mode='categorical') 
 
-compute_step_epoch=lambda x:int(math.ceil(1.* x/10))
-steps_of_epochs_training=compute_step_epoch(220)
-steps_of_epoch_test=compute_step_epoch(55)
+compute_step_epoch=lambda x:int(math.ceil(1.* x/2))
+steps_of_epochs_training=compute_step_epoch(168)
+steps_of_epoch_test=compute_step_epoch(42)
 # Training the CNN on the Training set and evaluating it on the Test set
 classifier.fit_generator(training_set,
                   steps_per_epoch = steps_of_epochs_training,#no. of images in our training set
@@ -81,8 +84,8 @@ classifier.fit_generator(training_set,
 
 
 model_json = classifier.to_json()
-with open("model-bw-tkdi.json", "w") as json_file:
+with open("model-bw-mns.json", "w") as json_file:
     json_file.write(model_json)
 print('Model Saved')
-classifier.save_weights('model-bw-tkdi.h5')
+classifier.save_weights('model-bw-mns.h5')
 print('Weights saved')

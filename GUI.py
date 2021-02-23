@@ -2,6 +2,9 @@ from tkinter import *
 import cv2
 from PIL import Image, ImageTk
 from keras.models import model_from_json
+from string import ascii_uppercase
+from hunspell import Hunspell
+import operator
 
 class app:
     def __init__(self):
@@ -54,8 +57,13 @@ class app:
         self.loaded_model_smn = model_from_json(self.model_json_smn)
         self.loaded_model_smn.load_weights(self.directory+"model-bw-mns.h5")
         
+        self.ct = {}
+        self.ct['blank'] = 0
+        self.blank_flag = 0
+        for i in ascii_uppercase:
+          self.ct[i] = 0
         #Main Window Initialization
-        self.root=Tk() 
+        self.root=Toplevel() 
         self.root.title("Sign to Text Converter")
         self.root.protocol('WM_DELETE_WINDOW', self.destructor) # https://stackoverflow.com/questions/111155/how-do-i-handle-the-window-close-event-in-tkinter
         self.root.geometry("900x850+0+0")#0+0 defines position of the window
@@ -190,8 +198,8 @@ class app:
             #Configuring Sentence Panel
             self.senpanel.config(text=self.str,font=("Courier",30))    
         
-            self.root.after(50,video_loop())
-            '''Tk().after(delay, callback=None) is a method defined for all tkinter widgets. This method simply calls the function
+        self.root.after(50,self.video_loop())
+        '''Tk().after(delay, callback=None) is a method defined for all tkinter widgets. This method simply calls the function
                 callback after the given delay in ms. If no function is given, it acts similar to time.sleep
                 (but in milliseconds instead of seconds)'''
             #i.e. framerate(fps) will be 0.05 per second
@@ -207,9 +215,9 @@ class app:
         
         test_image = cv2.resize(test_image, (128,128))
         result = self.loaded_model.predict(test_image.reshape(1, 128, 128, 1))
-        result_dru = self.loaded_model-dru.predict(test_image.reshape(1 , 128 , 128 , 1))
-        result_tkdi = self.loaded_model-tkdi.predict(test_image.reshape(1 , 128 , 128 , 1))
-        result_smn = self.loaded_model-mns.predict(test_image.reshape(1 , 128 , 128 , 1))
+        result_dru = self.loaded_model_dru.predict(test_image.reshape(1 , 128 , 128 , 1))
+        result_tkdi = self.loaded_model_tkdi.predict(test_image.reshape(1 , 128 , 128 , 1))
+        result_smn = self.loaded_model_smn.predict(test_image.reshape(1 , 128 , 128 , 1))
         prediction={}
         prediction['blank'] = result[0][0]
         inde = 1
@@ -217,7 +225,7 @@ class app:
             prediction[i] = result[0][inde]
             inde += 1
         #LAYER 1
-        prediction = sorted(prediction.items(), key=operator.itemgetter(1), reverse=True)
+        prediction = sorted(prediction.items(),key=operator.itemgetter(1), reverse=True)
         self.current_symbol = prediction[0][0]
         #LAYER 2
         if(self.current_symbol == 'D' or self.current_symbol == 'R' or self.current_symbol == 'U'):
