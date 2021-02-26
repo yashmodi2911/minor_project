@@ -7,11 +7,13 @@ Created on Mon Feb 22 22:59:49 2021
 
 import tkinter as tk
 import cv2
+import os
 from PIL import Image, ImageTk
 from keras.models import model_from_json
 from keras.preprocessing import image
 import numpy as np
 
+path=os.getcwd()
 class GUI:
     def __init__(self):
         self.cap=cv2.VideoCapture(0)
@@ -25,23 +27,7 @@ class GUI:
         self.loaded_model = model_from_json(self.model_json)
         self.loaded_model.load_weights(self.directory+"/model-bw.h5")
         
-        self.json_file_dru = open(self.directory+"/model-bw-dru.json", "r")
-        self.model_json_dru = self.json_file_dru.read()
-        self.json_file.close()
-        self.loaded_model_dru = model_from_json(self.model_json_dru)
-        self.loaded_model_dru.load_weights(self.directory+"/model-bw-dru.h5")
         
-        self.json_file_tkdi = open(self.directory+"/model-bw-tkdi.json", "r")
-        self.model_json_tkdi = self.json_file_tkdi.read()
-        self.json_file.close()
-        self.loaded_model_tkdi = model_from_json(self.model_json_tkdi)
-        self.loaded_model_tkdi.load_weights(self.directory+"/model-bw-tkdi.h5")
-        
-        self.json_file_mns = open(self.directory+"/model-bw-mns.json", "r")
-        self.model_json_mns = self.json_file_mns.read()
-        self.json_file.close()
-        self.loaded_model_mns = model_from_json(self.model_json_mns)
-        self.loaded_model_mns.load_weights(self.directory+"/model-bw-mns.h5")
         
         
         self.root=tk.Tk()
@@ -127,25 +113,25 @@ class GUI:
             # https://www.geeksforgeeks.org/python-thresholding-techniques-using-opencv-set-1-simple-thresholding/r
             #First argument is the source image, which should be a grayscale image.
              retval, res = cv2.threshold(th3, 70, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-             m,n=res.shape
-             img_new=np.zeros([m,n])
-             for i in range(1, m-1):
-                 for j in range(1, n-1):
-                     temp = [res[i-1, j-1], 
-                              res[i-1, j], 
-                              res[i-1, j + 1], 
-                              res[i, j-1], 
-                              res[i, j], 
-                              res[i, j + 1], 
-                              res[i + 1, j-1], 
-                              res[i + 1, j], 
-                              res[i + 1, j + 1]]
-                     temp = sorted(temp) 
-                     img_new[i, j]= temp[4] 
-              
+            # m,n=res.shape
+            # img_new=np.zeros([m,n])
+             #for i in range(1, m-1):
+              #   for j in range(1, n-1):
+               #      temp = [res[i-1, j-1], 
+                #             res[i-1, j], 
+                #              res[i-1, j + 1], 
+                 #             res[i, j-1], 
+                  #            res[i, j], 
+                   #          res[i + 1, j-1], 
+                     #         res[i + 1, j], 
+                   #           res[i + 1, j + 1]]
+                   #  temp = sorted(temp) 
+                    # img_new[i, j]= temp[4] 
             
-             img_new=img_new.astype(np.uint8)
-             res=img
+            
+            
+             #img_new=img_new.astype(np.uint8)
+             #res=img
              self.predict(res)
             #retval is used in Otsu thresholding  image binarization -- https://medium.com/@hbyacademic/otsu-thresholding-4337710dc519
              '''For this, our cv2.threshold() function is used, but pass an extra flag, cv2.THRESH_OTSU. For threshold value, simply
@@ -167,12 +153,9 @@ class GUI:
             
     def predict(self,test_image):
         test_image = cv2.resize(test_image, (128,128))
-        result = self.loaded_model.predict(test_image.reshape(1, 128, 128, 1))
-        result_dru = self.loaded_model_dru.predict(test_image.reshape(1 , 128 , 128 , 1))
-        result_tkdi = self.loaded_model_tkdi.predict(test_image.reshape(1 , 128 , 128 , 1))
-        result_mns = self.loaded_model_mns.predict(test_image.reshape(1 , 128 , 128 , 1))
+        result = self.loaded_model.predict_classes(test_image.reshape(1, 128, 128, 1))
+        
         print(result)
-        print(result[0][0])
        
         
         

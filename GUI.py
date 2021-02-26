@@ -288,3 +288,22 @@ class app:
                 self.word += self.current_symbol    
 pba = app()
 pba.root.mainloop()
+
+
+#self.json_file_dru = open(self.directory+"/model-bw-dru.json", "r")
+        #self.model_json_dru = self.json_file_dru.read()
+        #self.json_file.close()
+        #self.loaded_model_dru = model_from_json(self.model_json_dru)
+        #self.loaded_model_dru.load_weights(self.directory+"/model-bw-dru.h5")
+        
+        self.json_file_tkdi = open(self.directory+"/model-bw-tkdi.json", "r")
+        self.model_json_tkdi = self.json_file_tkdi.read()
+        self.json_file.close()
+        self.loaded_model_tkdi = model_from_json(self.model_json_tkdi)
+        self.loaded_model_tkdi.load_weights(self.directory+"/model-bw-tkdi.h5")
+        
+        self.json_file_mns = open(self.directory+"/model-bw-mns.json", "r")
+        self.model_json_mns = self.json_file_mns.read()
+        self.json_file.close()
+        self.loaded_model_mns = model_from_json(self.model_json_mns)
+        self.loaded_model_mns.load_weights(self.directory+"/model-bw-mns.h5")

@@ -25,9 +25,9 @@ classifier.add(MaxPooling2D(pool_size=(2, 2)))
 classifier.add(Convolution2D(32, (3, 3), activation='relu'))
 # input_shape is going to be the pooled feature maps from the previous convolution layer
 classifier.add(MaxPooling2D(pool_size=(2, 2)))
-classifier.add(Convolution2D(32, (3, 3), activation='relu'))
+#classifier.add(Convolution2D(32, (3, 3), activation='relu'))
 # input_shape is going to be the pooled feature maps from the previous convolution layer
-classifier.add(MaxPooling2D(pool_size=(2, 2)))
+#classifier.add(MaxPooling2D(pool_size=(2, 2)))
 
 # Flattening the layers
 classifier.add(Flatten())
@@ -38,7 +38,7 @@ classifier.add(Dropout(0.40))
 classifier.add(Dense(units=96, activation='relu'))
 classifier.add(Dropout(0.40))
 classifier.add(Dense(units=64, activation='relu'))
-classifier.add(Dense(units=1, activation='sigmoid')) # softmax for more than 2
+classifier.add(Dense(units=3, activation='softmax')) # softmax for more than 2
 
 # Compiling the CNN
 classifier.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy']) # categorical_crossentropy for more than 2
@@ -60,21 +60,21 @@ train_datagen = ImageDataGenerator(
 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
-training_set = train_datagen.flow_from_directory('mns/train',
+training_set = train_datagen.flow_from_directory('dru/train',
                                                  target_size=(sz, sz),
-                                                 batch_size=2,
+                                                 batch_size=10,
                                                  color_mode='grayscale',
                                                  class_mode='categorical')
 
-test_set = test_datagen.flow_from_directory('mns/test',
+test_set = test_datagen.flow_from_directory('dru/test',
                                             target_size=(sz , sz),
-                                            batch_size=2,
+                                            batch_size=10,
                                             color_mode='grayscale',
                                             class_mode='categorical') 
 
-compute_step_epoch=lambda x:int(math.ceil(1.* x/2))
-steps_of_epochs_training=compute_step_epoch(168)
-steps_of_epoch_test=compute_step_epoch(42)
+compute_step_epoch=lambda x:int(math.ceil(1.* x/10))
+steps_of_epochs_training=compute_step_epoch(1401)
+steps_of_epoch_test=compute_step_epoch(465)
 # Training the CNN on the Training set and evaluating it on the Test set
 classifier.fit_generator(training_set,
                   steps_per_epoch = steps_of_epochs_training,#no. of images in our training set
@@ -84,8 +84,8 @@ classifier.fit_generator(training_set,
 
 
 model_json = classifier.to_json()
-with open("model-bw-mns.json", "w") as json_file:
+with open("model-bw-dru.json", "w") as json_file:
     json_file.write(model_json)
 print('Model Saved')
-classifier.save_weights('model-bw-mns.h5')
+classifier.save_weights('model-bw-dru.h5')
 print('Weights saved')
