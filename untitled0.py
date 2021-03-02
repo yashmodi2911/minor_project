@@ -8,9 +8,11 @@ Created on Mon Feb 22 22:59:49 2021
 import tkinter as tk
 import cv2
 import os
+import operator
 from PIL import Image, ImageTk
 from keras.models import model_from_json
 from keras.preprocessing import image
+from string import ascii_uppercase
 import numpy as np
 
 path=os.getcwd()
@@ -27,13 +29,30 @@ class GUI:
         self.loaded_model = model_from_json(self.model_json)
         self.loaded_model.load_weights(self.directory+"/model-bw.h5")
         
+        self.json_file_dru = open(self.directory+"/model-bw-dru.json" , "r")
+        self.model_json_dru = self.json_file_dru.read()
+        self.json_file_dru.close()
+        self.loaded_model_dru = model_from_json(self.model_json_dru)
+        self.loaded_model_dru.load_weights(self.directory+"/model-bw-dru.h5")
+
+        self.json_file_tkdi = open(self.directory+"/model-bw-tkdi.json" , "r")
+        self.model_json_tkdi = self.json_file_tkdi.read()
+        self.json_file_tkdi.close()
+        self.loaded_model_tkdi = model_from_json(self.model_json_tkdi)
+        self.loaded_model_tkdi.load_weights(self.directory+"/model-bw-tkdi.h5")
+
+        self.json_file_smn = open(self.directory+"/model-bw-mns.json" , "r")
+        self.model_json_smn = self.json_file_smn.read()
+        self.json_file_smn.close()
+        self.loaded_model_smn = model_from_json(self.model_json_smn)
+        self.loaded_model_smn.load_weights(self.directory+"/model-bw-mns.h5")
         
-        
+
         
         self.root=tk.Tk()
         self.root.title("Sign to Text Converter")
         self.root.protocol('WM_DELETE_WINDOW', self.destructor)
-        self.root.geometry("900x850+0+0")
+        self.root.geometry("900x1100+0+0")
         
         #Heading
         self.heading = tk.Label(self.root,text = "ASL recognition using CNN",font=("Comic Sans MS",23,"bold"))
@@ -41,7 +60,7 @@ class GUI:
         
         #Video Panel For Camera Input
         self.video=tk.Label(self.root)
-        self.video.place(x = 135, y = 60, width = 640, height = 640)
+        self.video.place(x = 135, y = 10, width = 640, height = 640)
         
         #Filtered image Panel
         self.filter =tk.Label(self.root)
@@ -69,6 +88,8 @@ class GUI:
         self.sent =tk.Label(self.root)
         self.sent.place(x = 10,y = 760)
         self.sent.config(text ="Sentence :",font=("Courier",30,"bold"))
+        
+        self.current_symbol=None
         self.video_loop()
         
         
@@ -153,9 +174,25 @@ class GUI:
             
     def predict(self,test_image):
         test_image = cv2.resize(test_image, (128,128))
-        result = self.loaded_model.predict_classes(test_image.reshape(1, 128, 128, 1))
+        result = self.loaded_model.predict(test_image.reshape(1, 128, 128, 1))
+        result_dru = self.loaded_model_dru.predict(test_image.reshape(1 , 128 , 128 , 1))
+        result_tkdi = self.loaded_model_tkdi.predict(test_image.reshape(1 , 128 , 128 , 1))
+        result_smn = self.loaded_model_smn.predict(test_image.reshape(1 , 128 , 128 , 1))
+        prediction={}
+        prediction['blank'] = result[0][0]
+        inde = 1
+        for i in ascii_uppercase:
+            prediction[i] = result[0][inde]
+            inde += 1
+        #LAYER 1
+        new_dict=dict([(value,key) for key,value in prediction.items()])
+        prediction = sorted(prediction.items(),key=operator.itemgetter(1), reverse=True)
+        self.current_symbol = prediction[0][0]
+        print(self.current_symbol)
+        print(prediction)
         
-        print(result)
+        
+        
        
         
         

@@ -38,7 +38,7 @@ classifier.add(Dropout(0.40))
 classifier.add(Dense(units=96, activation='relu'))
 classifier.add(Dropout(0.40))
 classifier.add(Dense(units=64, activation='relu'))
-classifier.add(Dense(units=3, activation='softmax')) # softmax for more than 2
+classifier.add(Dense(units=27, activation='softmax')) # softmax for more than 2
 
 # Compiling the CNN
 classifier.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy']) # categorical_crossentropy for more than 2
@@ -51,41 +51,38 @@ from keras.preprocessing.image import ImageDataGenerator
 
 train_datagen = ImageDataGenerator(
         rescale=1./255,
-        rotation_range=40,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
         shear_range=0.2,
         zoom_range=0.2,
         horizontal_flip=True)
 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
-training_set = train_datagen.flow_from_directory('dru/train',
+training_set = train_datagen.flow_from_directory('dataset/train',
                                                  target_size=(sz, sz),
                                                  batch_size=10,
                                                  color_mode='grayscale',
                                                  class_mode='categorical')
 
-test_set = test_datagen.flow_from_directory('dru/test',
+test_set = test_datagen.flow_from_directory('dataset/test',
                                             target_size=(sz , sz),
                                             batch_size=10,
                                             color_mode='grayscale',
                                             class_mode='categorical') 
 
 compute_step_epoch=lambda x:int(math.ceil(1.* x/10))
-steps_of_epochs_training=compute_step_epoch(1401)
-steps_of_epoch_test=compute_step_epoch(465)
+steps_of_epochs_training=compute_step_epoch(12845)
+steps_of_epoch_test=compute_step_epoch(4268)
 # Training the CNN on the Training set and evaluating it on the Test set
 classifier.fit_generator(training_set,
                   steps_per_epoch = steps_of_epochs_training,#no. of images in our training set
-                  epochs = 25,
+                  epochs = 5,
                   validation_data =test_set,
                   validation_steps = steps_of_epoch_test)
 
 
 model_json = classifier.to_json()
-with open("model-bw-dru.json", "w") as json_file:
+with open("model-bw.json", "w") as json_file:
     json_file.write(model_json)
 print('Model Saved')
-classifier.save_weights('model-bw-dru.h5')
+classifier.save_weights('model-bw.h5')
 print('Weights saved')
