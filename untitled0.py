@@ -47,7 +47,11 @@ class GUI:
         self.loaded_model_smn = model_from_json(self.model_json_smn)
         self.loaded_model_smn.load_weights(self.directory+"/model-bw-mns.h5")
         
-
+        self.ct = {}
+        self.ct['blank'] = 0
+        self.blank_flag = 0
+        for i in ascii_uppercase:
+          self.ct[i] = 0
         
         self.root=tk.Tk()
         self.root.title("Sign to Text Converter")
@@ -90,6 +94,8 @@ class GUI:
         self.sent.config(text ="Sentence :",font=("Courier",30,"bold"))
         
         self.current_symbol=None
+        self.str=""
+        self.word=""
         self.video_loop()
         
         
@@ -165,11 +171,15 @@ class GUI:
              #configuring filter panel defined in __init__
              self.filter.imgtk=imgtk
              self.filter.config(image=imgtk)
+             self.charpanel.config(text=self.current_symbol,font=("Courier",20))
+             self.wordpanel.config(text=self.word,font=("Courier",20))
+             self.senpanel.config(text=self.str,font=("Courier",20))
+             
             
             
             
              
-        self.root.after(20, self.video_loop)
+        self.root.after(5, self.video_loop)
           
             
     def predict(self,test_image):
@@ -189,6 +199,47 @@ class GUI:
         prediction = sorted(prediction.items(),key=operator.itemgetter(1), reverse=True)
         self.current_symbol = prediction[0][0]
         print(self.current_symbol)
+        #Layer 2
+       
+        if(self.current_symbol == 'blank'):
+            for i in ascii_uppercase:
+                self.ct[i] = 0
+                
+        self.ct[self.current_symbol]+=1
+        if(self.ct[self.current_symbol]>40):
+            for i in ascii_uppercase:
+                if(i==self.current_symbol):
+                    continue
+                tmp=self.ct[self.current_symbol]-self.ct[i]
+                if tmp<0:
+                    tmp*=-1
+                if tmp<=10:
+                    self.ct['blank']=0
+                    for i in ascii_uppercase:
+                        self.ct[i]=0
+                    return
+                self.ct['blank'] = 0
+                for i in ascii_uppercase:
+                    self.ct[i] = 0
+                if self.current_symbol == 'blank':
+                    if self.blank_flag == 0:
+                        self.blank_flag = 1
+                        if len(self.str) > 0:
+                            self.str += " "
+                    self.str += self.word
+                    self.word = ""
+                else:
+                    if(len(self.str) > 16):
+                        self.str = ""
+                    self.blank_flag = 0
+                    self.word += self.current_symbol
+                
+                
+        
+            
+        
+            
+        
         print(prediction)
         
         
