@@ -1,6 +1,6 @@
 #American-Sign-Language-to-Text.
 
-This projects take image dataset from:
+This projects take image dataset from: https://www.kaggle.com/ayuraj/asl-dataset
 
 We preprocessed the data for reducing the computantional power and then trained a CNN model for getting the real time predictions of signs to text.
 There is not one, but two layers of CNN which improves the accuracy of the model.
@@ -10,4 +10,4 @@ We used tkinter for GUI which makes it dynamic in its use and can be used with m
 A video of our working project: 
 
 Project Members: 
-  Prakhar Tripathi//Yash Modi//Abhishek Agarwal 
+  Prakhar Tripathi//Yash Modi//Abhishek Agarwal//Prerna Singh//Anas
