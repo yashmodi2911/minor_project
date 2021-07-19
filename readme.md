@@ -1,4 +1,4 @@
-#American-Sign-Language-to-Text.
+American Sign Language to Text.
 
 This projects take image dataset from: https://www.kaggle.com/ayuraj/asl-dataset
 
