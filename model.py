@@ -4,69 +4,85 @@ Created on Thu Nov 26 13:50:42 2020
 
 @author: hp
 """
+from keras.models import Sequential
+from keras.layers import Convolution2D
+from keras.layers import MaxPooling2D
+from keras.layers import Flatten
+from keras.layers import Dense , Dropout
+import os
 import math
-import tensorflow as tf
-from keras.preprocessing.image import ImageDataGenerator
-tf.__version__
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+sz = 128
+# Step 1 - Building the CNN
 
-compute_step_epoch=lambda x:int(math.ceil(1.* x/32))#calculation of epoches step
+# Initializing the CNN
+classifier = Sequential()
 
+# First convolution layer and pooling
+classifier.add(Convolution2D(32, (3, 3), input_shape=(sz, sz, 1), activation='relu'))
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+# Second convolution layer and pooling
+classifier.add(Convolution2D(32, (3, 3), activation='relu'))
+# input_shape is going to be the pooled feature maps from the previous convolution layer
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+classifier.add(Convolution2D(32, (3, 3), activation='relu'))
+# input_shape is going to be the pooled feature maps from the previous convolution layer
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
 
-cnn = tf.keras.models.Sequential()
+# Flattening the layers
+classifier.add(Flatten())
 
-# Step 1 - Convolution
-cnn.add(tf.keras.layers.Conv2D(filters=32, kernel_size=3, padding="same", activation="relu", input_shape=(64, 64, 3)))
-
-# Step 2 - Pooling
-cnn.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2, padding='valid'))
-
-# Adding a second convolutional layer(to increase a success)
-cnn.add(tf.keras.layers.Conv2D(filters=32, kernel_size=3, padding="same", activation="relu"))
-cnn.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2, padding='valid'))
-
-# Step 3 - Flattening
-cnn.add(tf.keras.layers.Flatten())
-
-# Step 4 - Full Connection
-cnn.add(tf.keras.layers.Dense(units=128, activation='relu'))
-
-# Step 5 - Output Layer
-cnn.add(tf.keras.layers.Dense(units=1, activation='sigmoid'))
-
-
-
-# Part 3 - Training the CNN
+# Adding a fully connected layer
+classifier.add(Dense(units=128, activation='relu'))
+classifier.add(Dropout(0.40))
+classifier.add(Dense(units=96, activation='relu'))
+classifier.add(Dropout(0.40))
+classifier.add(Dense(units=64, activation='relu'))
+classifier.add(Dense(units=27, activation='softmax')) # softmax for more than 2
 
 # Compiling the CNN
-cnn.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])#loss='categorical_crossentropy'
+classifier.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy']) # categorical_crossentropy for more than 2
 
-train_datagen = ImageDataGenerator(rescale = 1./255,
-                                   shear_range = 0.2,
-                                   zoom_range = 0.2,
-                                   horizontal_flip = True)
 
-# Generating images for the Test set
-test_datagen = ImageDataGenerator(rescale = 1./255)
+# Step 2 - Preparing the train/test data and training the model
+classifier.summary()
+# Code copied from - https://keras.io/preprocessing/image/
+from keras.preprocessing.image import ImageDataGenerator
 
-# Creating the Training set
-training_set = train_datagen.flow_from_directory('data_set/train',
-                                                 target_size = (64, 64),
-                                                 batch_size = 32,
-                                                 class_mode = 'categorical')
+train_datagen = ImageDataGenerator(
+        rescale=1./255,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True)
 
-# Creating the Test set
-test_set = test_datagen.flow_from_directory('data_set/test',
-                                            target_size = (64, 64),
-                                            batch_size = 32,
-                                            class_mode = 'categorical')
+test_datagen = ImageDataGenerator(rescale=1./255)
 
-steps_of_epochs_training=compute_step_epoch(1452)
-steps_of_epoch_test=compute_step_epoch(363)
+training_set = train_datagen.flow_from_directory('dataset/train',
+                                                 target_size=(sz, sz),
+                                                 batch_size=10,
+                                                 color_mode='grayscale',
+                                                 class_mode='categorical')
+
+test_set = test_datagen.flow_from_directory('dataset/test',
+                                            target_size=(sz , sz),
+                                            batch_size=10,
+                                            color_mode='grayscale',
+                                            class_mode='categorical') 
+
+compute_step_epoch=lambda x:int(math.ceil(1.* x/10))
+steps_of_epochs_training=compute_step_epoch(12845)
+steps_of_epoch_test=compute_step_epoch(4268)
 # Training the CNN on the Training set and evaluating it on the Test set
-cnn.fit_generator(training_set,
+classifier.fit_generator(training_set,
                   steps_per_epoch = steps_of_epochs_training,#no. of images in our training set
-                  epochs = 25,
+                  epochs = 5,
                   validation_data =test_set,
                   validation_steps = steps_of_epoch_test)
 
 
+model_json = classifier.to_json()
+with open("model-bw.json", "w") as json_file:
+    json_file.write(model_json)
+print('Model Saved')
+classifier.save_weights('model-bw.h5')
+print('Weights saved')
