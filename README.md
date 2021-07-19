@@ -10,6 +10,6 @@ We used tkinter for GUI which makes it dynamic in its use and can be used with m
 A video of our working project: 
 
 Project Members: 
-  Prakhar Tripathi
-  Yash Modi
-  Abhishek Agarwal
+  Prakhar Tripathi @tripprakhar
+  Yash Modi @yashmodi2911
+  Abhishek Agarwal @?
